@@ -58,19 +58,18 @@ class MusicBrainzBraceCheck(TargetCheck):
     def check_single(self, source, target, unit):
         """Check single target string with its source string
 
-        Note that target string is allowed to use braces:
-            in any order (thus `sorted`)
-            any additional number of times (thus `set`)
+        Note that target string is allowed to use braces
+        in any order any additional number of times (thus `set`)
         """
 
         source_matches = MUSICBRAINZ_BRACE_MATCH.findall(source)
-        source_identifiers = sorted(set(
+        source_identifiers = set(
             map(lambda m: m[1], source_matches)
-        ))
+        )
 
         target_matches = MUSICBRAINZ_BRACE_MATCH.findall(target)
-        target_identifiers = sorted(set(
+        target_identifiers = set(
             map(lambda m: m[1], target_matches)
-        ))
+        )
 
         return source_identifiers != target_identifiers
