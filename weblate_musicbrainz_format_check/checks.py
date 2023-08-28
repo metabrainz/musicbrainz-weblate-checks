@@ -7,16 +7,16 @@
 
 import re
 
-from django.utils.translation import ugettext_lazy as _
-from weblate.checks.base import BaseFormatCheck
+from django.utils.translation import gettext_lazy as _
+from weblate.checks.base import TargetCheck
 
 MUSICBRAINZ_BRACE_MATCH = re.compile(
     r"""
-    {(                                  # initial {
+    {                                   # initial {
         (?P<identifier>
             [_A-Za-z][_0-9A-Za-z]*      # identifier
         )
-        (?:                             # optional replacement text
+        (?P<consequent>                 # optional replacement text
             :                           # ':' separator
             (?:
                 [^{}:%|]*               # text with only one
@@ -25,18 +25,18 @@ MUSICBRAINZ_BRACE_MATCH = re.compile(
                 |
                 [^{}:%|]+               # text without any placeholder
             )
-            (?:                         # optional alternative replacement text
-                \|                      # '|' separator
-                (?:
-                    [^{}:%|]*           # text with only one
-                    %                   # '%' placeholder for identifier
-                    [^{}:%|]*           # and more text
-                    |
-                    [^{}:%|]+           # text without any placeholder
-                )
-            )?
         )?
-    )}                                  # trailing }
+        (?P<alternative>                # optional alternative replacement text
+            \|                          # '|' separator
+            (?:
+                [^{}:%|]*               # text with only one
+                %                       # '%' placeholder for identifier
+                [^{}:%|]*               # and more text
+                |
+                [^{}:%|]+               # text without any placeholder
+            )
+        )?
+    }                                   # trailing }
     """,
     re.VERBOSE,
 )
@@ -55,22 +55,32 @@ class MusicBrainzBraceCheck(TargetCheck):
     # Description for failing check
     description = _("MusicBrainz brace format does not match source")
 
+
+    @staticmethod
+    def get_brace_info(match: re.Match):
+        identifier, consequent, alternative = match.group(
+            'identifier', 'consequent', 'alternative')
+        match_type = 'hyperlink' if (
+            consequent is None and alternative is not None
+        ) else 'text'
+        return (identifier, match_type)
+
+
     def check_single(self, source, target, unit):
         """Check single target string with its source string
 
-        Note that target string is allowed to use braces:
-            in any order (thus `sorted`)
-            any additional number of times (thus `set`)
+        Note that target string is allowed to use braces
+        in any order any additional number of times (thus `set`)
         """
 
-        source_matches = MUSICBRAINZ_BRACE_MATCH.findall(source)
-        source_identifiers = sorted(set(
-            map(lambda m: m.group('identifier'), source_matches)
-        ))
+        source_matches = MUSICBRAINZ_BRACE_MATCH.finditer(source)
+        source_identifiers = set(
+            self.get_brace_info(m) for m in source_matches
+        )
 
-        target_matches = MUSICBRAINZ_BRACE_MATCH.findall(target)
-        target_identifiers = sorted(set(
-            map(lambda m: m.group('identifier'), target_matches)
-        ))
+        target_matches = MUSICBRAINZ_BRACE_MATCH.finditer(target)
+        target_identifiers = set(
+            self.get_brace_info(m) for m in target_matches
+        )
 
-        return source_identifiers == target_identifiers
+        return source_identifiers != target_identifiers

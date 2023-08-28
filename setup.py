@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Weblate MusicBrainz I18n Format Check",
-    version="0.1a1",
+    version="1.0",
     author="yvanzo",
     author_email="yvanzo@metabrainz.org",
     description="Weblate check for MusicBrainz internationalization format.",
