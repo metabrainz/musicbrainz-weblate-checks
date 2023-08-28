@@ -12,7 +12,7 @@ from weblate.checks.base import TargetCheck
 
 MUSICBRAINZ_BRACE_MATCH = re.compile(
     r"""
-    {(                                  # initial {
+    {                                   # initial {
         (?P<identifier>
             [_A-Za-z][_0-9A-Za-z]*      # identifier
         )
@@ -36,7 +36,7 @@ MUSICBRAINZ_BRACE_MATCH = re.compile(
                 [^{}:%|]+               # text without any placeholder
             )
         )?
-    )}                                  # trailing }
+    }                                   # trailing }
     """,
     re.VERBOSE,
 )
