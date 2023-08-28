@@ -73,4 +73,4 @@ class MusicBrainzBraceCheck(TargetCheck):
             map(lambda m: m[1], target_matches)
         ))
 
-        return source_identifiers == target_identifiers
+        return source_identifiers != target_identifiers
