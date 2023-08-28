@@ -7,8 +7,8 @@
 
 import re
 
-from django.utils.translation import ugettext_lazy as _
-from weblate.checks.base import BaseFormatCheck
+from django.utils.translation import gettext_lazy as _
+from weblate.checks.base import TargetCheck
 
 MUSICBRAINZ_BRACE_MATCH = re.compile(
     r"""
@@ -65,12 +65,12 @@ class MusicBrainzBraceCheck(TargetCheck):
 
         source_matches = MUSICBRAINZ_BRACE_MATCH.findall(source)
         source_identifiers = sorted(set(
-            map(lambda m: m.group('identifier'), source_matches)
+            map(lambda m: m[1], source_matches)
         ))
 
         target_matches = MUSICBRAINZ_BRACE_MATCH.findall(target)
         target_identifiers = sorted(set(
-            map(lambda m: m.group('identifier'), target_matches)
+            map(lambda m: m[1], target_matches)
         ))
 
         return source_identifiers == target_identifiers
