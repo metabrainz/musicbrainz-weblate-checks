@@ -62,14 +62,14 @@ class MusicBrainzBraceCheck(TargetCheck):
         in any order any additional number of times (thus `set`)
         """
 
-        source_matches = MUSICBRAINZ_BRACE_MATCH.findall(source)
+        source_matches = MUSICBRAINZ_BRACE_MATCH.finditer(source)
         source_identifiers = set(
-            map(lambda m: m[1], source_matches)
+            m.group('identifier') for m in source_matches
         )
 
-        target_matches = MUSICBRAINZ_BRACE_MATCH.findall(target)
+        target_matches = MUSICBRAINZ_BRACE_MATCH.finditer(target)
         target_identifiers = set(
-            map(lambda m: m[1], target_matches)
+            m.group('identifier') for m in target_matches
         )
 
         return source_identifiers != target_identifiers
