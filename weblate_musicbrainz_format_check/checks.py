@@ -16,7 +16,7 @@ MUSICBRAINZ_BRACE_MATCH = re.compile(
         (?P<identifier>
             [_A-Za-z][_0-9A-Za-z]*      # identifier
         )
-        (?:                             # optional replacement text
+        (?P<consequent>                 # optional replacement text
             :                           # ':' separator
             (?:
                 [^{}:%|]*               # text with only one
@@ -25,16 +25,16 @@ MUSICBRAINZ_BRACE_MATCH = re.compile(
                 |
                 [^{}:%|]+               # text without any placeholder
             )
-            (?:                         # optional alternative replacement text
-                \|                      # '|' separator
-                (?:
-                    [^{}:%|]*           # text with only one
-                    %                   # '%' placeholder for identifier
-                    [^{}:%|]*           # and more text
-                    |
-                    [^{}:%|]+           # text without any placeholder
-                )
-            )?
+        )?
+        (?P<alternative>                # optional alternative replacement text
+            \|                          # '|' separator
+            (?:
+                [^{}:%|]*               # text with only one
+                %                       # '%' placeholder for identifier
+                [^{}:%|]*               # and more text
+                |
+                [^{}:%|]+               # text without any placeholder
+            )
         )?
     )}                                  # trailing }
     """,
@@ -55,6 +55,16 @@ class MusicBrainzBraceCheck(TargetCheck):
     # Description for failing check
     description = _("MusicBrainz brace format does not match source")
 
+
+    def get_brace_info(self, match):
+        identifier, consequent, alternative =
+            matches.group('identifier', 'consequent', 'alternative')
+        match_type = 'hyperlink' if (
+            consequent is None and alternative is not None
+        ) else 'text'
+        return (identifier, match_type)
+
+
     def check_single(self, source, target, unit):
         """Check single target string with its source string
 
@@ -64,12 +74,12 @@ class MusicBrainzBraceCheck(TargetCheck):
 
         source_matches = MUSICBRAINZ_BRACE_MATCH.finditer(source)
         source_identifiers = set(
-            m.group('identifier') for m in source_matches
+            get_brace_info(m) for m in source_matches
         )
 
         target_matches = MUSICBRAINZ_BRACE_MATCH.finditer(target)
         target_identifiers = set(
-            m.group('identifier') for m in target_matches
+            get_brace_info(m) for m in target_matches
         )
 
         return source_identifiers != target_identifiers
