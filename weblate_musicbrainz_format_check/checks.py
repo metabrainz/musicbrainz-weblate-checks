@@ -56,9 +56,10 @@ class MusicBrainzBraceCheck(TargetCheck):
     description = _("MusicBrainz brace format does not match source")
 
 
-    def get_brace_info(self, match):
-        identifier, consequent, alternative =
-            matches.group('identifier', 'consequent', 'alternative')
+    @staticmethod
+    def get_brace_info(match: re.Match):
+        identifier, consequent, alternative = match.group(
+            'identifier', 'consequent', 'alternative')
         match_type = 'hyperlink' if (
             consequent is None and alternative is not None
         ) else 'text'
@@ -74,12 +75,12 @@ class MusicBrainzBraceCheck(TargetCheck):
 
         source_matches = MUSICBRAINZ_BRACE_MATCH.finditer(source)
         source_identifiers = set(
-            get_brace_info(m) for m in source_matches
+            self.get_brace_info(m) for m in source_matches
         )
 
         target_matches = MUSICBRAINZ_BRACE_MATCH.finditer(target)
         target_identifiers = set(
-            get_brace_info(m) for m in target_matches
+            self.get_brace_info(m) for m in target_matches
         )
 
         return source_identifiers != target_identifiers
