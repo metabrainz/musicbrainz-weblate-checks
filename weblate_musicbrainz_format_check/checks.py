@@ -62,6 +62,12 @@ class MusicBrainzBraceCheck(TargetCheck):
             'identifier', 'consequent', 'alternative')
         match_type = 'hyperlink' if (
             consequent is None and alternative is not None
+        ) else 'instrument' if (
+            identifier == 'instrument' and
+            consequent == ':%' and alternative is not None
+        ) else 'vocal' if (
+            identifier == 'vocal' and
+            consequent == ':%' and alternative is not None
         ) else 'text'
         return (identifier, match_type)
 
