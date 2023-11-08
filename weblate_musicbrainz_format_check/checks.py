@@ -61,13 +61,13 @@ class MusicBrainzBraceCheck(TargetCheck):
         identifier, consequent, alternative = match.group(
             'identifier', 'consequent', 'alternative')
         match_type = 'hyperlink' if (
-            consequent is None and alternative is not None
+            consequent is None and alternative is not None and alternative != '|'
         ) else 'instrument' if (
             identifier == 'instrument' and
-            consequent == ':%' and alternative is not None
+            consequent == ':%' and alternative is not None and alternative != '|'
         ) else 'vocal' if (
             identifier == 'vocal' and
-            consequent == ':%' and alternative is not None
+            consequent == ':%' and alternative is not None and alternative != '|'
         ) else 'text'
         return (identifier, match_type)
 

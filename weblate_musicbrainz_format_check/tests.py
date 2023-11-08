@@ -112,6 +112,12 @@ class MusicBrainzBraceCheckTest(CheckTestCase):
                                     "{instrument:%} retez", None)
         )
 
+    def test_instrument_empty_plural_format(self):
+        self.assertTrue(
+            self.check.check_single("{instrument:%|instruments} string",
+                                    "{instrument:%|} retez", None)
+        )
+
     def test_vocal_format(self):
         self.assertFalse(
             self.check.check_single("{vocal:%|vocals} string",
@@ -130,6 +136,12 @@ class MusicBrainzBraceCheckTest(CheckTestCase):
                                     "{vocal:%} retez", None)
         )
 
+    def test_vocal_empty_plural_format(self):
+        self.assertTrue(
+            self.check.check_single("{vocal:%|vocals} string",
+                                    "{vocal:%|} retez", None)
+        )
+
     def test_hyperlink_format(self):
         self.assertFalse(
             self.check.check_single("{var|title} string",
@@ -140,6 +152,12 @@ class MusicBrainzBraceCheckTest(CheckTestCase):
         self.assertTrue(
             self.check.check_single("{var|title} string",
                                     "{var} retez", None)
+        )
+
+    def test_empty_title_for_hyperlink_format(self):
+        self.assertTrue(
+            self.check.check_single("{var|title} string",
+                                    "{var|} retez", None)
         )
 
     def test_substitute_instead_of_hyperlink_format(self):
